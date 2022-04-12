@@ -34,7 +34,7 @@ object Lists:
     if (start >= end) {
       0;
     }
-    else if (start == end + 1) {
+    else if (start + 1 == end) {
       xs(start);
     }
     else {
@@ -64,7 +64,7 @@ object Lists:
     if (start >= end) {
       throw new java.util.NoSuchElementException("Empty List xs");
     }
-    else if (start == end + 1) {
+    else if (start + 1 == end) {
       xs(start);
     }
     else {
