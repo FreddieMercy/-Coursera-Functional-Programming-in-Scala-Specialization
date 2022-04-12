@@ -30,7 +30,7 @@ object Lists:
   }
 
 
-  def sum_helper(xs: => List[Int], start: => Int, end: => Int): Int = {
+  def sum_helper(xs: List[Int], start: Int, end: Int): Int = {
     if (start >= end) {
       0;
     }
@@ -60,7 +60,7 @@ object Lists:
     max_helper(xs, 0, xs.length);
   }
 
-  def max_helper(xs: => List[Int], start: => Int, end: => Int): Int = {
+  def max_helper(xs: List[Int], start: Int, end: Int): Int = {
     if (start >= end) {
       throw new java.util.NoSuchElementException("Empty List xs");
     }
