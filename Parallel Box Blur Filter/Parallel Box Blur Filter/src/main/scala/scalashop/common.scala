@@ -44,6 +44,8 @@ class Img(val width: Int, val height: Int, private val data: Array[RGBA]):
 def boxBlurKernel(src: Img, x: Int, y: Int, radius: Int): RGBA = {
 	
 	def twoWhilteLoopImplementation_GetPixels(x: Int, y: Int, width: Int, height: Int) = {
+		val size: Int = (width - x) * (height - y)
+		
 		var i = x
 		var j = y
 		
@@ -52,7 +54,6 @@ def boxBlurKernel(src: Img, x: Int, y: Int, radius: Int): RGBA = {
 		var g: Int = 0
 		var b: Int = 0
 		
-		val size: Int = (width - x) * (height - y)
 		
 		while (i < width) {
 			while (j < height) {
@@ -74,10 +75,9 @@ def boxBlurKernel(src: Img, x: Int, y: Int, radius: Int): RGBA = {
 	twoWhilteLoopImplementation_GetPixels(clamp(src.width - radius, 0, src.width),
 		clamp(src.height - radius, 0, src.height),
 		clamp(src.width + radius, 0, src.width),
-		clamp(src.height + radius, 0, src.width))
+		clamp(src.height + radius, 0, src.height))
 }
 
-}
 
 val forkJoinPool = ForkJoinPool()
 
