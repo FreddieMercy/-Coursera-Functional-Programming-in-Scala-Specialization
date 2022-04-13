@@ -42,40 +42,26 @@ class Img(val width: Int, val height: Int, private val data: Array[RGBA]):
 
 /** Computes the blurred RGBA value of a single pixel of the input image. */
 def boxBlurKernel(src: Img, x: Int, y: Int, radius: Int): RGBA = {
+	if (radius == 0) {
+		src.apply(x, y)
+	}
+	var a: Int = 0
+	var r: Int = 0
+	var g: Int = 0
+	var b: Int = 0
+	var size: Int = 0
 	
-	def twoWhilteLoopImplementation_GetPixels(x: Int, y: Int, width: Int, height: Int) = {
-		val size: Int = (width - x) * (height - y)
+	for (i <- clamp(x - radius, 0, src.width - 1) to clamp(x + radius, 0, src.width - 1);
+	     j <- clamp(y - radius, 0, src.height - 1) to clamp(y + radius, 0, src.height - 1)) {
 		
-		var i = x
-		var j = y
-		
-		var a: Int = 0
-		var r: Int = 0
-		var g: Int = 0
-		var b: Int = 0
-		
-		
-		while (i < width) {
-			while (j < height) {
-				
-				a += alpha(src(i, j))
-				r += red(src(i, j))
-				g += green(src(i, j))
-				b += blue(src(i, j))
-				
-				j += 1
-			}
-			j = y
-			i += 1
-		}
-		
-		rgba(r / size, g / size, b / size, a / size)
+		a += alpha(src.apply(i, j))
+		r += red(src.apply(i, j))
+		g += green(src.apply(i, j))
+		b += blue(src.apply(i, j))
+		size += 1
 	}
 	
-	twoWhilteLoopImplementation_GetPixels(clamp(src.width - radius, 0, src.width),
-		clamp(src.height - radius, 0, src.height),
-		clamp(src.width + radius, 0, src.width),
-		clamp(src.height + radius, 0, src.height))
+	rgba(r / size, g / size, b / size, a / size)
 }
 
 

@@ -50,7 +50,7 @@ object HorizontalBoxBlur extends HorizontalBoxBlurInterface :
 	 * columns.
 	 */
 	def parBlur(src: Img, dst: Img, numTasks: Int, radius: Int): Unit = {
-		val starts = List.range(0, src.height, src.height / numTasks)
+		val starts = if (src.height / numTasks > 0) List.range(0, src.height, src.height / numTasks) else List.range(0, src.height)
 		val stops = starts.tail ::: List(src.height)
 		starts.zip(stops).map { (from, end) => task[Unit](blur(src, dst, from, end, radius)) }.foreach(_.join())
 	}
