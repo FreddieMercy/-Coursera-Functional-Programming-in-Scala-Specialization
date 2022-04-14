@@ -72,9 +72,18 @@ object ParallelCountChange extends ParallelCountChangeInterface:
   /** In parallel, counts the number of ways change can be made from the
    *  specified list of coins for the specified amount of money.
    */
-  def parCountChange(money: Int, coins: List[Int], threshold: Threshold): Int =
-    ???
+  def parCountChange(money: Int, coins: List[Int], threshold: Threshold): Int = {
+    def parCountChange_helper(_money: Int, index: Int): Int = {
+      if (threshold(_money, coins)) {
+        countChange(_money, coins)
+      }
+      else {
+        List.range(index, coins.length).map(i => task(parCountChange_helper(_money-coins(i), i))).map(_.join()).sum
+      }
+    }
 
+    parCountChange_helper(money, 0)
+  }
   /** Threshold heuristic based on the starting money. */
   def moneyThreshold(startingMoney: Int): Threshold =
     ???
