@@ -4,18 +4,28 @@ import java.awt.*
 import java.awt.event.*
 import javax.swing.*
 import javax.swing.event.*
-import scala.{collection => coll}
-import scala.collection.parallel.{TaskSupport, Combiner}
-import scala.collection.parallel.mutable.ParHashSet
+import scala.collection as coll
 import scala.collection.parallel.CollectionConverters.*
+import scala.collection.parallel.mutable.ParHashSet
+import scala.collection.parallel.{Combiner, TaskSupport}
 
 class Simulator(val taskSupport: TaskSupport, val timeStats: TimeStatistics):
 
-  def updateBoundaries(boundaries: Boundaries, body: Body): Boundaries =
-    ???
+  def updateBoundaries(boundaries: Boundaries, body: Body): Boundaries = {
+    boundaries.minX = Math.min(boundaries.minX, body.x)
+    boundaries.maxX = Math.max(boundaries.maxX, body.x)
+    boundaries.minY = Math.min(boundaries.minY, body.y)
+    boundaries.maxY = Math.max(boundaries.maxY, body.y)
+    boundaries
+  }
 
-  def mergeBoundaries(a: Boundaries, b: Boundaries): Boundaries =
-    ???
+  def mergeBoundaries(a: Boundaries, b: Boundaries): Boundaries = {
+    a.minX = Math.min(a.minX, b.minX)
+    a.maxX = Math.max(a.maxX, b.maxX)
+    a.minY = Math.min(a.minY, b.minY)
+    a.maxY = Math.max(a.maxY, b.maxY)
+    a
+  }
 
   def computeBoundaries(bodies: coll.Seq[Body]): Boundaries = timeStats.timed("boundaries") {
     val parBodies = bodies.par
@@ -26,7 +36,7 @@ class Simulator(val taskSupport: TaskSupport, val timeStats: TimeStatistics):
   def computeSectorMatrix(bodies: coll.Seq[Body], boundaries: Boundaries): SectorMatrix = timeStats.timed("matrix") {
     val parBodies = bodies.par
     parBodies.tasksupport = taskSupport
-    ???
+    parBodies.aggregate(new SectorMatrix(boundaries, SECTOR_PRECISION))((matrix, body) => matrix += body, (mA, mB) => mA.combine(mB))
   }
 
   def computeQuad(sectorMatrix: SectorMatrix): Quad = timeStats.timed("quad") {
@@ -36,7 +46,7 @@ class Simulator(val taskSupport: TaskSupport, val timeStats: TimeStatistics):
   def updateBodies(bodies: coll.Seq[Body], quad: Quad): coll.Seq[Body] = timeStats.timed("update") {
     val parBodies = bodies.par
     parBodies.tasksupport = taskSupport
-    ???
+    parBodies.map(body => body.updated(quad)).toIndexedSeq
   }
 
   def eliminateOutliers(bodies: coll.Seq[Body], sectorMatrix: SectorMatrix, quad: Quad): coll.Seq[Body] = timeStats.timed("eliminate") {
