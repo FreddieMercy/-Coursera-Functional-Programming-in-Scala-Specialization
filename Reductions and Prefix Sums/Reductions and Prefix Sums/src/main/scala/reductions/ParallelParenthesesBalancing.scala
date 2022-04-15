@@ -1,7 +1,8 @@
 package reductions
 
-import scala.annotation.*
 import org.scalameter.*
+
+import scala.annotation.*
 
 object ParallelParenthesesBalancingRunner:
 
@@ -14,7 +15,7 @@ object ParallelParenthesesBalancingRunner:
     Key.exec.maxWarmupRuns := 80,
     Key.exec.benchRuns := 120,
     Key.verbose := false
-  ) withWarmer(Warmer.Default())
+  ) withWarmer (Warmer.Default())
 
   def main(args: Array[String]): Unit =
     val length = 100000000
@@ -33,35 +34,43 @@ object ParallelParenthesesBalancingRunner:
     println(s"parallel balancing time: $fjtime")
     println(s"speedup: ${seqtime.value / fjtime.value}")
 
-object ParallelParenthesesBalancing extends ParallelParenthesesBalancingInterface:
+object ParallelParenthesesBalancing extends ParallelParenthesesBalancingInterface :
 
   /** Returns `true` iff the parentheses in the input `chars` are balanced.
    */
   def balance(chars: Array[Char]): Boolean = {
-    def balance_helper(left:Int, right:Int, index:Int):Boolean={
+    def balance_helper(left: Int, right: Int, index: Int): Boolean = {
 
-      if(index >= chars.length){
+      if (index >= chars.length) {
         return left == right
       }
 
-      if(left > right){
+      if (right > left) {
         return false
       }
 
-      for(i<-index until chars.length){
-        if(chars(i) == '('){
-          balance_helper(left + 1, right, i+1)
+      if (chars(index) == '(') {
+        if (right > 0) {
+          return balance_helper(left, right - 1, index + 1)
         }
-
-        if(chars(i) == ')'){
-          balance_helper(left, right+1, i+1)
+        else {
+          return balance_helper(left + 1, right, index + 1)
         }
       }
 
-      left==right
+      if (chars(index) == ')') {
+        if (left > 0) {
+          return balance_helper(left - 1, right, index + 1)
+        }
+        else {
+          return balance_helper(left, right + 1, index + 1)
+        }
+      }
+
+      return balance_helper(left, right, index + 1)
     }
 
-    balance_helper(0,0, 0)
+    balance_helper(0, 0, 0)
   }
 
   /** Returns `true` iff the parentheses in the input `chars` are balanced.

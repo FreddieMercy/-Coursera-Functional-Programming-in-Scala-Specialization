@@ -13,7 +13,7 @@ object ParallelCountChangeRunner:
     Key.exec.maxWarmupRuns := 40,
     Key.exec.benchRuns := 80,
     Key.verbose := false
-  ) withWarmer(Warmer.Default())
+  ) withWarmer (Warmer.Default())
 
   def main(args: Array[String]): Unit =
     val amount = 250
@@ -42,21 +42,28 @@ object ParallelCountChangeRunner:
     println("\n# Using combinedThreshold\n")
     measureParallelCountChange(ParallelCountChange.combinedThreshold(amount, coins))
 
-object ParallelCountChange extends ParallelCountChangeInterface:
+object ParallelCountChange extends ParallelCountChangeInterface :
 
   /** Returns the number of ways change can be made from the specified list of
-   *  coins for the specified amount of money.
+   * coins for the specified amount of money.
    */
   def countChange(money: Int, coins: List[Int]): Int = {
-    def countChange_helper(_money:Int,  index:Int):Int={
-      var ans:Int = 0
+    if (money == 0) {
+      return 1
+    }
+    else if (money < 0 || coins.isEmpty) {
+      return 0
+    }
 
-      for(i <- index until coins.length){
+    def countChange_helper(_money: Int, index: Int): Int = {
+      var ans: Int = 0
+
+      for (i <- index until coins.length) {
         var left_over = _money - coins(i)
-        if(left_over == 0){
-          ans+=1
+        if (left_over == 0) {
+          ans += 1
         }
-        else if(left_over > 0){
+        else if (left_over > 0) {
           ans += countChange_helper(left_over, i)
         }
       }
@@ -70,25 +77,25 @@ object ParallelCountChange extends ParallelCountChangeInterface:
   type Threshold = (Int, List[Int]) => Boolean
 
   /** In parallel, counts the number of ways change can be made from the
-   *  specified list of coins for the specified amount of money.
+   * specified list of coins for the specified amount of money.
    */
 
 
   def parCountChange(money: Int, coins: List[Int], threshold: Threshold): Int = {
-      if (threshold(money, coins)){
-        countChange(money, coins)
+    if (threshold(money, coins)) {
+      countChange(money, coins)
+    }
+    else {
+      coins match {
+        case Nil => 0
+        case head :: tail =>
+          val (left, right) = parallel(
+            parCountChange(money - head, coins, threshold),
+            parCountChange(money, tail, threshold)
+          )
+          left + right
       }
-      else {
-        coins match {
-          case Nil => 0
-          case head :: tail =>
-            val (left, right) = parallel(
-              parCountChange(money - head, coins, threshold),
-              parCountChange(money, tail, threshold)
-            )
-            left + right
-        }
-      }
+    }
   }
 
 
