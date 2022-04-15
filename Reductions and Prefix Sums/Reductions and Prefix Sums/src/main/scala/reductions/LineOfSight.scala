@@ -82,8 +82,18 @@ object LineOfSight extends LineOfSightInterface:
    *  given the `startingAngle`.
    */
   def downsweepSequential(input: Array[Float], output: Array[Float],
-    startingAngle: Float, from: Int, until: Int): Unit =
-    ???
+    startingAngle: Float, from: Int, until: Int): Unit = {
+    var ans = startingAngle
+    for(i <- from until until){
+      if(i == 0){
+        ans = Math.max(0.0f, ans)
+      }
+      else{
+        ans = Math.max(input(i)/i, ans)
+      }
+      output.update(i, ans)
+    }
+  }
 
   /** Pushes the maximum angle in the prefix of the array to each leaf of the
    *  reduction `tree` in parallel, and then calls `downsweepSequential` to write
