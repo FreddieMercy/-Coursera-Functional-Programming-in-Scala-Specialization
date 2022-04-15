@@ -34,7 +34,7 @@ object LineOfSight extends LineOfSightInterface:
 
   def lineOfSight(input: Array[Float], output: Array[Float]): Unit = {
 
-    output.update(0,0.0)
+    output.update(0,0.0f)
 
     for(i<-1 until input.length){
       output.update(i, Math.max(input(i)/i, output(i-1)))
@@ -43,8 +43,19 @@ object LineOfSight extends LineOfSightInterface:
 
   /** Traverses the specified part of the array and returns the maximum angle.
    */
-  def upsweepSequential(input: Array[Float], from: Int, until: Int): Float =
-    ???
+  def upsweepSequential(input: Array[Float], from: Int, until: Int): Float = {
+
+    var ans = Float.MinValue
+    for(i <- from until until){
+      if(i == 0){
+        ans = Math.max(0.0f, ans)
+      }
+      else{
+        ans = Math.max(input(i)/i, ans)
+      }
+    }
+    ans
+  }
 
   /** Traverses the part of the array starting at `from` and until `end`, and
    *  returns the reduction tree for that part of the array.
